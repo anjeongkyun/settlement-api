@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "1.8.20"
 }
 
-project(":test") {
+project(":unit-test") {
     dependencies {
         testImplementation(project(":domain-model"))
         testImplementation(project(":api"))
