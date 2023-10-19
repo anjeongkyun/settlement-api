@@ -6,6 +6,7 @@ plugins {
 
 project(":data-access") {
     dependencies {
+        implementation(project(":contracts"))
         implementation(project(":domain-model"))
         implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
