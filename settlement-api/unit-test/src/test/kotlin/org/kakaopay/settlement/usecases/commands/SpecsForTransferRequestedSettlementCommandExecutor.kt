@@ -1,15 +1,11 @@
 package org.kakaopay.settlement.usecases.commands
 
-import TestRepositoryContext
 import autoparams.AutoSource
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.bson.types.ObjectId
 import org.junit.jupiter.params.ParameterizedTest
-import org.kakaopay.settlement.PriceAmount
-import org.kakaopay.settlement.Recipient
-import org.kakaopay.settlement.SettlementStatus
-import org.kakaopay.settlement.TransactionType
+import org.kakaopay.settlement.*
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
 import org.kakaopay.settlement.entities.Settlement
 import org.kakaopay.settlement.repositories.SettlementRepository
