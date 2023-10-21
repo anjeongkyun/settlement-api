@@ -23,7 +23,7 @@ class SpecsForRequestSettlementCommandExecutor(
 
     @ParameterizedTest
     @AutoSource
-    fun sut_creates_settlement_correctly(
+    fun sut_creates_settlement_with_requested_command_correctly(
         requesterId: String,
         price: PriceAmount,
         recipients: List<Recipient>
