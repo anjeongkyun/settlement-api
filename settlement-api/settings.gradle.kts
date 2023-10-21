@@ -7,3 +7,4 @@ include(
     "contracts",
     "unit-test"
 )
+include("publisher")
