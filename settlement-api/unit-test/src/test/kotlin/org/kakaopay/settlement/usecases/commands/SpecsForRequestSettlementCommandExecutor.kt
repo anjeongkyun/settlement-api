@@ -77,7 +77,9 @@ class SpecsForRequestSettlementCommandExecutor(
         sut.execute(command)
 
         //Assert
-        val actual = settlementRepository.getList().first()
+        val actual = settlementRepository.getList(
+            requesterId = requesterId
+        ).first()
         assertThat(actual.status).isEqualTo(SettlementStatus.PENDING)
     }
 
@@ -104,7 +106,9 @@ class SpecsForRequestSettlementCommandExecutor(
         sut.execute(command)
 
         //Assert
-        val actual = settlementRepository.getList().first()
+        val actual = settlementRepository.getList(
+            requesterId = requesterId
+        ).first()
         assertThat(actual.transactions).isEmpty()
     }
 
