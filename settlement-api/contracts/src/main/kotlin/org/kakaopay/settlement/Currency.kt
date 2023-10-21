@@ -1,5 +1,5 @@
 package org.kakaopay.settlement
 
-enum class CurrencyType {
+enum class Currency {
     KRW
 }
