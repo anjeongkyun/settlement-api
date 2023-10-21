@@ -4,7 +4,9 @@ import org.kakaopay.settlement.MongoDbConfiguration
 import org.kakaopay.settlement.entities.Settlement
 import org.kakaopay.settlement.mappers.SettlementDataMapper
 import org.kakaopay.settlement.models.SettlementDataModel
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.index.Index
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 
@@ -15,6 +17,21 @@ class SettlementRepositoryImpl(
 
     //TODO: Index 고민
     private fun getCollection(): MongoTemplate {
+        val collection = this.database.getMongoTemplate()
+        collection.indexOps(entityType)
+            .ensureIndex(
+                Index()
+                    .named("requesterId_1_recipientId_1_idx")
+                    .on(
+                        "requesterId",
+                        Sort.Direction.ASC
+                    )
+                    .on(
+                        "recipients.userId",
+                        Sort.Direction.ASC
+                    )
+            )
+
         return database.getMongoTemplate()
     }
 
