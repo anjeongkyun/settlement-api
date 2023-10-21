@@ -1,5 +1,6 @@
+package org.kakaopay.settlement
+
 import com.mongodb.ConnectionString
-import org.kakaopay.settlement.MongoDbConfiguration
 import org.kakaopay.settlement.repositories.SettlementRepository
 import org.kakaopay.settlement.repositories.SettlementRepositoryImpl
 import org.springframework.boot.test.context.TestConfiguration
