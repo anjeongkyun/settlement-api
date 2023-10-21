@@ -4,6 +4,7 @@ import org.kakaopay.settlement.publisher.SettlementRequestedEventPublisher
 import org.kakaopay.settlement.repositories.SettlementRepository
 import org.kakaopay.settlement.usecases.commands.RequestSettlementCommandExecutor
 import org.kakaopay.settlement.usecases.commands.TransferRequestedSettlementCommandExecutor
+import org.kakaopay.settlement.usecases.queries.GetSettlementsForRecipientQueryProcessor
 import org.kakaopay.settlement.usecases.queries.GetSettlementsForRequesterQueryProcessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,6 +35,15 @@ open class UseCaseContext {
         settlementRepository: SettlementRepository
     ): GetSettlementsForRequesterQueryProcessor {
         return GetSettlementsForRequesterQueryProcessor(
+            settlementRepository
+        )
+    }
+
+    @Bean
+    open fun getSettlementsForRecipientQueryProcessor(
+        settlementRepository: SettlementRepository
+    ): GetSettlementsForRecipientQueryProcessor {
+        return GetSettlementsForRecipientQueryProcessor(
             settlementRepository
         )
     }
