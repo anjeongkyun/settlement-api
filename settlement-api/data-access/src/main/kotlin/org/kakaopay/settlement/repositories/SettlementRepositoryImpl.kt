@@ -24,7 +24,7 @@ class SettlementRepositoryImpl(
     ): List<Settlement> {
         val query = Query()
         requesterId?.let { query.addCriteria(Criteria.where("requesterId").`is`(it)) }
-        recipientId?.let { query.addCriteria(Criteria.where("recipientId").`is`(it)) }
+        recipientId?.let { query.addCriteria(Criteria.where("recipients.userId").`is`(it)) }
         return getCollection()
             .find(query, entityType)
             .map { SettlementDataMapper.toEntity(it) }
@@ -36,5 +36,20 @@ class SettlementRepositoryImpl(
                 getCollection()
                     .save(SettlementDataMapper.toDocument(settlement))
             )
+    }
+
+    override fun update(settlementId: String, modifier: (Settlement) -> Settlement) {
+        getCollection()
+            .findOne(
+                Query(Criteria.where("id").`is`(settlementId)),
+                this.entityType
+            )
+            ?.let { SettlementDataMapper.toEntity(it) }
+            ?.let { settlement ->
+                getCollection().save(
+                    SettlementDataMapper.toDocument(modifier(settlement))
+                )
+            }
+            ?: throw RuntimeException()
     }
 }
