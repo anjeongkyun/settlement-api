@@ -2,9 +2,13 @@ package org.kakaopay.settlement.controllers
 
 import org.kakaopay.settlement.commands.RequestSettlementCommand
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
+import org.kakaopay.settlement.queries.GetSettlementForRecipientQuery
+import org.kakaopay.settlement.queries.GetSettlementForRecipientQueryResponse
 import org.kakaopay.settlement.queries.GetSettlementForRequesterQuery
+import org.kakaopay.settlement.queries.GetSettlementForRequesterQueryResponse
 import org.kakaopay.settlement.usecases.commands.RequestSettlementCommandExecutor
 import org.kakaopay.settlement.usecases.commands.TransferRequestedSettlementCommandExecutor
+import org.kakaopay.settlement.usecases.queries.GetSettlementsForRecipientQueryProcessor
 import org.kakaopay.settlement.usecases.queries.GetSettlementsForRequesterQueryProcessor
 import org.springframework.web.bind.annotation.*
 
@@ -12,7 +16,8 @@ import org.springframework.web.bind.annotation.*
 class SettlementController(
     private val requestedSettlementCommandExecutor: RequestSettlementCommandExecutor,
     private val transferRequestedSettlementCommandExecutor: TransferRequestedSettlementCommandExecutor,
-    private val getSettlementsForRequesterQueryProcessor: GetSettlementsForRequesterQueryProcessor
+    private val getSettlementsForRequesterQueryProcessor: GetSettlementsForRequesterQueryProcessor,
+    private val getSettlementsForRecipientQueryProcessor: GetSettlementsForRecipientQueryProcessor
 ) {
 
     @PostMapping("/settlements/commands/request-settlement")
@@ -38,10 +43,21 @@ class SettlementController(
     @PostMapping("/settlements/quries/get-settlements-for-requester")
     fun getSettlementsForRequester(
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
-    ) {
-        getSettlementsForRequesterQueryProcessor.process(
+    ): GetSettlementForRequesterQueryResponse {
+        return getSettlementsForRequesterQueryProcessor.process(
             query = GetSettlementForRequesterQuery(
                 requesterId = userId
+            )
+        )
+    }
+
+    @PostMapping("/settlements/quries/get-settlements-for-recipient")
+    fun getSettlementsForRecipient(
+        @RequestHeader(value = "X-USER-ID", required = true) userId: String,
+    ): GetSettlementForRecipientQueryResponse {
+        return getSettlementsForRecipientQueryProcessor.process(
+            query = GetSettlementForRecipientQuery(
+                recipientId = userId
             )
         )
     }
