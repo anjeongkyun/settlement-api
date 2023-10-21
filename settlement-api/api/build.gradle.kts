@@ -9,6 +9,7 @@ project(":api") {
         implementation(project(":contracts"))
         implementation(project(":data-access"))
         implementation(project(":domain-model"))
+        implementation(project(":publisher"))
 
         implementation("org.springframework.boot:spring-boot-starter")
         implementation("org.springframework.boot:spring-boot-starter-web")
