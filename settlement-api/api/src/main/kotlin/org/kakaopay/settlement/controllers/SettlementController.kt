@@ -40,7 +40,7 @@ class SettlementController(
         )
     }
 
-    @PostMapping("/settlements/quries/get-settlements-for-requester")
+    @GetMapping("/settlements/queries/get-settlements-for-requester")
     fun getSettlementsForRequester(
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
     ): GetSettlementForRequesterQueryResponse {
@@ -51,7 +51,7 @@ class SettlementController(
         )
     }
 
-    @PostMapping("/settlements/quries/get-settlements-for-recipient")
+    @GetMapping("/settlements/queries/get-settlements-for-recipient")
     fun getSettlementsForRecipient(
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
     ): GetSettlementForRecipientQueryResponse {
