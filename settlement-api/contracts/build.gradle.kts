@@ -8,6 +8,11 @@ plugins {
 
 project(":contracts") {
     dependencies {
+        implementation(
+            group = "com.fasterxml.jackson.core",
+            name = "jackson-annotations",
+            version = "2.12.4"
+        )
     }
     checkstyle {
         configFile = file("../.rules/checkstyle/checkstyle.xml")

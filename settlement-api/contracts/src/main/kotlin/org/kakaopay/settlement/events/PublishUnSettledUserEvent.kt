@@ -1,5 +1,7 @@
 package org.kakaopay.settlement.events
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 data class PublishUnSettledUserEvent(
-    val settlementId: String
+    @JsonProperty("settlementId") val settlementId: String
 )
