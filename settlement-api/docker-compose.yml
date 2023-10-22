@@ -3,4 +3,4 @@ services:
   mongodb:
     image: mongo
     ports:
-      - '3333:27017'
+      - '27017:27017'

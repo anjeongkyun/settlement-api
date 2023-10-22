@@ -39,7 +39,7 @@ open class TestRepositoryContext {
 
     @Bean
     open fun mongoDatabaseFactory(): MongoDatabaseFactory {
-        return SimpleMongoClientDatabaseFactory(ConnectionString("mongodb://localhost:3333/test"))
+        return SimpleMongoClientDatabaseFactory(ConnectionString("mongodb://localhost:27017/test"))
     }
 
     @Bean
