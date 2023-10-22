@@ -69,4 +69,11 @@ class SettlementRepositoryImpl(
             }
             ?: throw RuntimeException()
     }
+
+    override fun exists(settlementId: String): Boolean {
+        return getCollection().exists(
+            Query(Criteria.where("id").`is`(settlementId)),
+            this.entityType
+        )
+    }
 }

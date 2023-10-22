@@ -10,4 +10,5 @@ interface SettlementRepository {
 
     fun create(settlement: Settlement): Settlement
     fun update(settlementId: String, modifier: (Settlement) -> Settlement)
+    fun exists(settlementId: String): Boolean
 }
