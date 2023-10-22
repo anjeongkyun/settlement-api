@@ -2,6 +2,7 @@ package org.kakaopay.settlement.controllers
 
 import org.kakaopay.settlement.commands.RequestSettlementCommand
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
+import org.kakaopay.settlement.events.PublishUnSettledUserEvent
 import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.exceptions.toHttpException
 import org.kakaopay.settlement.queries.GetSettlementForRecipientQuery
@@ -10,6 +11,7 @@ import org.kakaopay.settlement.queries.GetSettlementForRequesterQuery
 import org.kakaopay.settlement.queries.GetSettlementForRequesterQueryResponse
 import org.kakaopay.settlement.usecases.commands.RequestSettlementCommandExecutor
 import org.kakaopay.settlement.usecases.commands.TransferRequestedSettlementCommandExecutor
+import org.kakaopay.settlement.usecases.handlers.PublishUnSettledUserEventHandler
 import org.kakaopay.settlement.usecases.queries.GetSettlementsForRecipientQueryProcessor
 import org.kakaopay.settlement.usecases.queries.GetSettlementsForRequesterQueryProcessor
 import org.springframework.http.HttpStatus
@@ -20,7 +22,8 @@ class SettlementController(
     private val requestedSettlementCommandExecutor: RequestSettlementCommandExecutor,
     private val transferRequestedSettlementCommandExecutor: TransferRequestedSettlementCommandExecutor,
     private val getSettlementsForRequesterQueryProcessor: GetSettlementsForRequesterQueryProcessor,
-    private val getSettlementsForRecipientQueryProcessor: GetSettlementsForRecipientQueryProcessor
+    private val getSettlementsForRecipientQueryProcessor: GetSettlementsForRecipientQueryProcessor,
+    private val publishUnSettledUserEventHandler: PublishUnSettledUserEventHandler
 ) {
 
     @PostMapping("/settlements/commands/request-settlement")
@@ -71,5 +74,16 @@ class SettlementController(
                 recipientId = userId
             )
         )
+    }
+
+    @PostMapping("/settlements/commands/publish-un-settled-user-event")
+    fun publishUnSettledUserEvent(
+        @RequestBody event: PublishUnSettledUserEvent
+    ) {
+        try {
+            publishUnSettledUserEventHandler.handle(event = event)
+        } catch (err: InvalidRequestException) {
+            err.toHttpException(HttpStatus.BAD_REQUEST)
+        }
     }
 }
