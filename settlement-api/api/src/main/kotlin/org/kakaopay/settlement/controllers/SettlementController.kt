@@ -2,8 +2,8 @@ package org.kakaopay.settlement.controllers
 
 import org.kakaopay.settlement.commands.RequestSettlementCommand
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
-import org.kakaopay.settlement.exceptions.HttpException
 import org.kakaopay.settlement.exceptions.InvalidRequestException
+import org.kakaopay.settlement.exceptions.toHttpException
 import org.kakaopay.settlement.queries.GetSettlementForRecipientQuery
 import org.kakaopay.settlement.queries.GetSettlementForRecipientQueryResponse
 import org.kakaopay.settlement.queries.GetSettlementForRequesterQuery
@@ -28,9 +28,13 @@ class SettlementController(
         @RequestBody command: RequestSettlementCommand,
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
     ) {
-        requestedSettlementCommandExecutor.execute(
-            command.copy(requesterId = userId)
-        )
+        try {
+            requestedSettlementCommandExecutor.execute(
+                command.copy(requesterId = userId)
+            )
+        } catch (err: InvalidRequestException) {
+            err.toHttpException(HttpStatus.BAD_REQUEST)
+        }
     }
 
     @PostMapping("/settlements/commands/transfer-requested-settlement")
@@ -43,12 +47,7 @@ class SettlementController(
                 command.copy(userId = userId)
             )
         } catch (err: InvalidRequestException) {
-            throw HttpException(
-                HttpStatus.BAD_REQUEST.value(),
-                err.message,
-                err.className,
-                err.errorProperties
-            )
+            err.toHttpException(HttpStatus.BAD_REQUEST)
         }
     }
 
