@@ -5,19 +5,20 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.kakaopay.settlement.Recipient
 import org.kakaopay.settlement.TestRepositoryContext
-import org.kakaopay.settlement.commands.PublishUnSettledUserCommand
 import org.kakaopay.settlement.doubles.SettlementPendedEventPublisherSpy
 import org.kakaopay.settlement.entities.Settlement
+import org.kakaopay.settlement.events.PublishUnSettledUserEvent
 import org.kakaopay.settlement.exceptions.ErrorReason
 import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.repositories.SettlementRepository
+import org.kakaopay.settlement.usecases.handlers.PublishUnSettledUserEventHandler
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import org.springframework.test.context.ContextConfiguration
 
 @DataMongoTest
 @ContextConfiguration(classes = [TestRepositoryContext::class])
-class SpecsForPublishUnSettledUserCommandExecutor(
+class SpecsForPublishUnSettledUserEventHandler(
     @Autowired val settlementRepository: SettlementRepository
 ) {
 
@@ -41,17 +42,17 @@ class SpecsForPublishUnSettledUserCommandExecutor(
             )
         )
         val settlementPendedEventPublisher = SettlementPendedEventPublisherSpy()
-        val sut = PublishUnSettledUserCommandExecutor(
+        val sut = PublishUnSettledUserEventHandler(
             settlementRepository,
             settlementPendedEventPublisher
         )
 
-        val command = PublishUnSettledUserCommand(
+        val event = PublishUnSettledUserEvent(
             createdSettlement.id!!
         )
 
         //Act
-        sut.execute(command)
+        sut.handle(event)
 
         //Assert
         val actual = settlementPendedEventPublisher.getEvent()
@@ -66,16 +67,16 @@ class SpecsForPublishUnSettledUserCommandExecutor(
     ) {
         //Arrange
         val settlementPendedEventPublisher = SettlementPendedEventPublisherSpy()
-        val sut = PublishUnSettledUserCommandExecutor(
+        val sut = PublishUnSettledUserEventHandler(
             settlementRepository,
             settlementPendedEventPublisher
         )
-        val command = PublishUnSettledUserCommand(settlementId)
+        val event = PublishUnSettledUserEvent(settlementId)
 
         //Act
         var actual: InvalidRequestException? = null
         try {
-            sut.execute(command)
+            sut.handle(event)
         } catch (err: InvalidRequestException) {
             actual = err;
         }

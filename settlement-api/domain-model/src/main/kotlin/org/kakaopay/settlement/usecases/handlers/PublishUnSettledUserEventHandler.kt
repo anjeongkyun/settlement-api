@@ -1,6 +1,6 @@
-package org.kakaopay.settlement.usecases.commands
+package org.kakaopay.settlement.usecases.handlers
 
-import org.kakaopay.settlement.commands.PublishUnSettledUserCommand
+import org.kakaopay.settlement.events.PublishUnSettledUserEvent
 import org.kakaopay.settlement.events.SettlementPendedEvent
 import org.kakaopay.settlement.exceptions.ErrorProperties
 import org.kakaopay.settlement.exceptions.ErrorReason
@@ -8,12 +8,12 @@ import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.publisher.SettlementPendedEventPublisher
 import org.kakaopay.settlement.repositories.SettlementRepository
 
-class PublishUnSettledUserCommandExecutor(
+class PublishUnSettledUserEventHandler(
     private val settlementRepository: SettlementRepository,
     private val settlementPendedEventPublisher: SettlementPendedEventPublisher
 ) {
-    fun execute(command: PublishUnSettledUserCommand) {
-        val settlement = settlementRepository.findById(command.settlementId)
+    fun handle(event: PublishUnSettledUserEvent) {
+        val settlement = settlementRepository.findById(event.settlementId)
             ?: throw InvalidRequestException(
                 errorProperties = listOf(
                     ErrorProperties(
@@ -27,7 +27,7 @@ class PublishUnSettledUserCommandExecutor(
         if (!settlement.recipients.all { it.isSettled }) {
             settlementPendedEventPublisher.publish(
                 SettlementPendedEvent(
-                    command.settlementId
+                    event.settlementId
                 )
             )
         }
