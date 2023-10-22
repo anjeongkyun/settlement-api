@@ -15,7 +15,6 @@ class SettlementRepositoryImpl(
 ) : SettlementRepository {
     private val entityType: Class<SettlementDataModel> = SettlementDataModel::class.java
 
-    //TODO: Index 고민
     private fun getCollection(): MongoTemplate {
         val collection = this.database.getMongoTemplate()
         collection.indexOps(entityType)
@@ -75,5 +74,12 @@ class SettlementRepositoryImpl(
             Query(Criteria.where("id").`is`(settlementId)),
             this.entityType
         )
+    }
+
+    override fun findById(settlementId: String): Settlement? {
+        return getCollection().findOne(
+            Query(Criteria.where("id").`is`(settlementId)),
+            this.entityType
+        )?.let { SettlementDataMapper.toEntity(it) }
     }
 }
