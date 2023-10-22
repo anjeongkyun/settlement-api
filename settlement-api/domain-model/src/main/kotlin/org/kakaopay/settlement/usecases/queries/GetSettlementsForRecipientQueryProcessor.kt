@@ -20,7 +20,8 @@ class GetSettlementsForRecipientQueryProcessor(
                         it.id!!,
                         it.price,
                         it.status,
-                        it.recipients
+                        it.recipients,
+                        it.createdDateTimeUtc
                     )
                 }
         )

@@ -11,6 +11,8 @@ import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.gateways.UserGateway
 import org.kakaopay.settlement.publisher.SettlementRequestedEventPublisher
 import org.kakaopay.settlement.repositories.SettlementRepository
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 class RequestSettlementCommandExecutor(
     private val settlementRepository: SettlementRepository,
@@ -30,7 +32,6 @@ class RequestSettlementCommandExecutor(
             )
         }
 
-
         val createdSettlement = settlementRepository.create(
             Settlement(
                 id = null,
@@ -44,7 +45,8 @@ class RequestSettlementCommandExecutor(
                             isSettled = false
                         )
                     },
-                transactions = emptyList()
+                transactions = emptyList(),
+                createdDateTimeUtc = OffsetDateTime.now(ZoneOffset.UTC)
             )
         )
 

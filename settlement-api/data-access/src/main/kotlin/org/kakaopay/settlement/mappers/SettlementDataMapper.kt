@@ -12,10 +12,11 @@ object SettlementDataMapper {
             dataModel.status,
             dataModel.requesterId,
             dataModel.recipients,
-            dataModel.transactions
+            dataModel.transactions,
+            dataModel.createdDateTimeUtc
         )
     }
-    
+
     fun toDocument(entity: Settlement): SettlementDataModel {
         return SettlementDataModel(
             entity.id?.let { ObjectId(it) },
@@ -23,7 +24,8 @@ object SettlementDataMapper {
             entity.status,
             entity.requesterId,
             entity.recipients,
-            entity.transactions
+            entity.transactions,
+            entity.createdDateTimeUtc
         )
     }
 }

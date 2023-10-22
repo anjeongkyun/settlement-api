@@ -40,7 +40,6 @@ class SpecsForGetSettlementsForRequesterQueryProcessor(
 
         //Assert
         assertThat(actual).isNotNull
-        assertThat(actual.requesterId).isEqualTo(settlement.requesterId)
         assertThat(actual.settlements).hasSize(size)
         val firstSettlement = actual.settlements.first()
         assertThat(firstSettlement.price).isNotNull

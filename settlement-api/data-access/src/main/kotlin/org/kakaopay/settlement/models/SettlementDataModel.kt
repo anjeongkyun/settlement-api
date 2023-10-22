@@ -4,6 +4,7 @@ import org.bson.types.ObjectId
 import org.kakaopay.settlement.*
 import org.kakaopay.settlement.entities.Transaction
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.OffsetDateTime
 
 @Document("settlements")
 data class SettlementDataModel(
@@ -12,5 +13,6 @@ data class SettlementDataModel(
     val status: SettlementStatus,
     val requesterId: String,
     val recipients: List<Recipient>,
-    val transactions: List<Transaction>
+    val transactions: List<Transaction>,
+    val createdDateTimeUtc: OffsetDateTime
 )

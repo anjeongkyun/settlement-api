@@ -12,7 +12,6 @@ class GetSettlementsForRequesterQueryProcessor(
         query: GetSettlementForRequesterQuery
     ): GetSettlementForRequesterQueryResponse {
         return GetSettlementForRequesterQueryResponse(
-            requesterId = query.requesterId,
             settlements = settlementRepository.getList(
                 requesterId = query.requesterId
             )
@@ -21,7 +20,8 @@ class GetSettlementsForRequesterQueryProcessor(
                         it.id!!,
                         it.price,
                         it.status,
-                        it.recipients
+                        it.recipients,
+                        it.createdDateTimeUtc
                     )
                 }
         )
