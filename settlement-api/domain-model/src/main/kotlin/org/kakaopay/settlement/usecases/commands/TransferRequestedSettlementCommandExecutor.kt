@@ -3,6 +3,7 @@ package org.kakaopay.settlement.usecases.commands
 import org.kakaopay.settlement.SettlementStatus
 import org.kakaopay.settlement.TransactionType
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
+import org.kakaopay.settlement.entities.Settlement
 import org.kakaopay.settlement.entities.Transaction
 import org.kakaopay.settlement.exceptions.ErrorProperties
 import org.kakaopay.settlement.exceptions.ErrorReason
@@ -12,7 +13,6 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-//TODO: status 만드는 코드 리팩터링
 class TransferRequestedSettlementCommandExecutor(
     private val settlementRepository: SettlementRepository,
 ) {
@@ -32,28 +32,42 @@ class TransferRequestedSettlementCommandExecutor(
         settlementRepository.update(
             command.settlementId
         ) { settlement ->
-            settlement.copy(
-                status = SettlementStatus.SETTLED
-                    .takeIf {
-                        settlement.recipients.count { !it.isSettled } == 1
-                                && settlement.recipients.any { it.userId == command.userId && !it.isSettled }
-                    } ?: SettlementStatus.PENDING,
-                recipients = settlement.recipients.map {
-                    if (it.userId == command.userId) {
-                        it.copy(isSettled = true)
-                    } else {
-                        it
-                    }
-                },
-                transactions = settlement.transactions + listOf(
-                    Transaction(
-                        id = UUID.randomUUID().toString(),
-                        price = command.price,
-                        createdDateTimeUtc = OffsetDateTime.now(ZoneOffset.UTC),
-                        type = TransactionType.SETTLEMENT
+            // 멱등성 보장을 위해 이미 정산된 유저일 경우, 그대로 반영 되도록 한다.
+            if (settlement.recipients.first { it.userId == command.userId }.isSettled) {
+                settlement
+            } else {
+                settlement.copy(
+                    status = getStatus(settlement, command),
+                    recipients = settlement.recipients.map {
+                        if (it.userId == command.userId) {
+                            it.copy(isSettled = true)
+                        } else {
+                            it
+                        }
+                    },
+                    transactions = settlement.transactions + listOf(
+                        Transaction(
+                            id = UUID.randomUUID().toString(),
+                            price = command.price,
+                            createdDateTimeUtc = OffsetDateTime.now(ZoneOffset.UTC),
+                            type = TransactionType.SETTLEMENT
+                        )
                     )
                 )
-            )
+            }
+        }
+    }
+
+    private fun getStatus(
+        settlement: Settlement,
+        command: TransferRequestedSettlementCommand
+    ): SettlementStatus {
+        val hasSingleUnsettledRecipient = settlement.recipients.count { !it.isSettled } == 1
+        val isCurrentUserUnsettled = settlement.recipients.any { it.userId == command.userId && !it.isSettled }
+        return when {
+            settlement.recipients.all { it.isSettled } -> SettlementStatus.SETTLED
+            hasSingleUnsettledRecipient && isCurrentUserUnsettled -> SettlementStatus.SETTLED
+            else -> SettlementStatus.PENDING
         }
     }
 }
