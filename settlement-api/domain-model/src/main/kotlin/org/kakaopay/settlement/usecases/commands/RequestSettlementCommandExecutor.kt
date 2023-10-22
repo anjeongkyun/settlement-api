@@ -1,5 +1,6 @@
 package org.kakaopay.settlement.usecases.commands
 
+import org.kakaopay.settlement.Recipient
 import org.kakaopay.settlement.SettlementStatus
 import org.kakaopay.settlement.commands.RequestSettlementCommand
 import org.kakaopay.settlement.entities.Settlement
@@ -17,10 +18,7 @@ class RequestSettlementCommandExecutor(
     private val userGateway: UserGateway
 ) {
     fun execute(command: RequestSettlementCommand) {
-        if (
-            !userGateway.existsUsers(
-                command.recipients.map { it.userId })
-        ) {
+        if (!userGateway.existsUsers(command.recipientIds)) {
             throw InvalidRequestException(
                 errorProperties = listOf(
                     ErrorProperties(
@@ -39,7 +37,13 @@ class RequestSettlementCommandExecutor(
                 price = command.price,
                 status = SettlementStatus.PENDING,
                 requesterId = command.requesterId,
-                recipients = command.recipients,
+                recipients = command.recipientIds
+                    .map {
+                        Recipient(
+                            userId = it,
+                            isSettled = false
+                        )
+                    },
                 transactions = emptyList()
             )
         )

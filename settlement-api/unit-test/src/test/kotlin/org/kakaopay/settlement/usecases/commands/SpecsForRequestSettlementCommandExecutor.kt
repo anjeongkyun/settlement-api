@@ -4,7 +4,6 @@ import autoparams.AutoSource
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.kakaopay.settlement.PriceAmount
-import org.kakaopay.settlement.Recipient
 import org.kakaopay.settlement.SettlementStatus
 import org.kakaopay.settlement.TestRepositoryContext
 import org.kakaopay.settlement.commands.RequestSettlementCommand
@@ -29,19 +28,19 @@ class SpecsForRequestSettlementCommandExecutor(
     fun sut_creates_settlement_with_requested_command_correctly(
         requesterId: String,
         price: PriceAmount,
-        recipients: List<Recipient>
+        recipientIds: List<String>
     ) {
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             SettlementRequestedEventPublisherSpy(),
-            UserGatewayStub(recipients[0].userId)
+            UserGatewayStub(recipientIds[0])
         )
 
         val command = RequestSettlementCommand(
             requesterId = requesterId,
             price = price,
-            recipients = recipients
+            recipientIds = recipientIds
         )
 
         //Act
@@ -55,7 +54,8 @@ class SpecsForRequestSettlementCommandExecutor(
         assertThat(actual).isNotNull
         assertThat(actual!!.requesterId).isEqualTo(requesterId)
         assertThat(actual!!.price).isEqualTo(price)
-        assertThat(actual!!.recipients).isEqualTo(recipients)
+        assertThat(actual!!.recipients.map { it.userId }).isEqualTo(recipientIds)
+        assertThat(actual!!.recipients.all { it.isSettled == false }).isTrue
     }
 
     @ParameterizedTest
@@ -63,19 +63,19 @@ class SpecsForRequestSettlementCommandExecutor(
     fun sut_creates_the_status_of_settlement_as_PENDING(
         requesterId: String,
         price: PriceAmount,
-        recipients: List<Recipient>
+        recipientIds: List<String>
     ) {
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             SettlementRequestedEventPublisherSpy(),
-            UserGatewayStub(recipients[0].userId)
+            UserGatewayStub(recipientIds[0])
         )
 
         val command = RequestSettlementCommand(
             requesterId = requesterId,
             price = price,
-            recipients = recipients
+            recipientIds = recipientIds
         )
 
         //Act
@@ -93,19 +93,19 @@ class SpecsForRequestSettlementCommandExecutor(
     fun sut_creates_transactions_as_empty_list(
         requesterId: String,
         price: PriceAmount,
-        recipients: List<Recipient>
+        recipientIds: List<String>
     ) {
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             SettlementRequestedEventPublisherSpy(),
-            UserGatewayStub(recipients[0].userId)
+            UserGatewayStub(recipientIds[0])
         )
 
         val command = RequestSettlementCommand(
             requesterId = requesterId,
             price = price,
-            recipients = recipients
+            recipientIds = recipientIds
         )
 
         //Act
@@ -123,20 +123,20 @@ class SpecsForRequestSettlementCommandExecutor(
     fun sut_publishes_an_event_when_settlement_correctly_is_created(
         requesterId: String,
         price: PriceAmount,
-        recipients: List<Recipient>
+        recipientIds: List<String>
     ) {
         //Arrange
         val publisher = SettlementRequestedEventPublisherSpy()
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             publisher,
-            UserGatewayStub(recipients[0].userId)
+            UserGatewayStub(recipientIds[0])
         )
 
         val command = RequestSettlementCommand(
             requesterId = requesterId,
             price = price,
-            recipients = recipients
+            recipientIds = recipientIds
         )
 
         //Act
@@ -154,7 +154,7 @@ class SpecsForRequestSettlementCommandExecutor(
     fun sut_throws_InvalidRequestException_when_id_recipients_of_command_does_not_exists_in_accounts(
         requesterId: String,
         price: PriceAmount,
-        recipients: List<Recipient>,
+        recipientIds: List<String>,
         unSavedUserId: String
     ) {
         //Arrange
@@ -168,7 +168,7 @@ class SpecsForRequestSettlementCommandExecutor(
         val command = RequestSettlementCommand(
             requesterId = requesterId,
             price = price,
-            recipients = recipients
+            recipientIds = recipientIds
         )
 
         //Act
