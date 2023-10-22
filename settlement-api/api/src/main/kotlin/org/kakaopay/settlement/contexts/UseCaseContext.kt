@@ -1,5 +1,6 @@
 package org.kakaopay.settlement.contexts
 
+import org.kakaopay.settlement.gateways.UserGateway
 import org.kakaopay.settlement.publisher.SettlementRequestedEventPublisher
 import org.kakaopay.settlement.repositories.SettlementRepository
 import org.kakaopay.settlement.usecases.commands.RequestSettlementCommandExecutor
@@ -22,11 +23,13 @@ open class UseCaseContext {
     @Bean
     open fun requestSettlementCommandExecutor(
         settlementRepository: SettlementRepository,
-        SettlementRequestedEventPublisher: SettlementRequestedEventPublisher
+        settlementRequestedEventPublisher: SettlementRequestedEventPublisher,
+        userGateway: UserGateway
     ): RequestSettlementCommandExecutor {
         return RequestSettlementCommandExecutor(
             settlementRepository,
-            SettlementRequestedEventPublisher
+            settlementRequestedEventPublisher,
+            userGateway
         )
     }
 

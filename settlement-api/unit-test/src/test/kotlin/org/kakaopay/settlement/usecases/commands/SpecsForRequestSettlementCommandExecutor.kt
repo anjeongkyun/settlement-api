@@ -9,7 +9,10 @@ import org.kakaopay.settlement.SettlementStatus
 import org.kakaopay.settlement.TestRepositoryContext
 import org.kakaopay.settlement.commands.RequestSettlementCommand
 import org.kakaopay.settlement.doubles.SettlementRequestedEventPublisherSpy
+import org.kakaopay.settlement.doubles.UserGatewayStub
 import org.kakaopay.settlement.events.SettlementRequestedEvent
+import org.kakaopay.settlement.exceptions.ErrorReason
+import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.repositories.SettlementRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
@@ -31,7 +34,8 @@ class SpecsForRequestSettlementCommandExecutor(
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
-            SettlementRequestedEventPublisherSpy()
+            SettlementRequestedEventPublisherSpy(),
+            UserGatewayStub(recipients[0].userId)
         )
 
         val command = RequestSettlementCommand(
@@ -64,7 +68,8 @@ class SpecsForRequestSettlementCommandExecutor(
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
-            SettlementRequestedEventPublisherSpy()
+            SettlementRequestedEventPublisherSpy(),
+            UserGatewayStub(recipients[0].userId)
         )
 
         val command = RequestSettlementCommand(
@@ -93,7 +98,8 @@ class SpecsForRequestSettlementCommandExecutor(
         //Arrange
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
-            SettlementRequestedEventPublisherSpy()
+            SettlementRequestedEventPublisherSpy(),
+            UserGatewayStub(recipients[0].userId)
         )
 
         val command = RequestSettlementCommand(
@@ -123,7 +129,8 @@ class SpecsForRequestSettlementCommandExecutor(
         val publisher = SettlementRequestedEventPublisherSpy()
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
-            publisher
+            publisher,
+            UserGatewayStub(recipients[0].userId)
         )
 
         val command = RequestSettlementCommand(
@@ -140,5 +147,44 @@ class SpecsForRequestSettlementCommandExecutor(
         assertThat(actual).isNotNull
         assertThat(actual).isInstanceOf(SettlementRequestedEvent::class.java)
         assertThat(actual!!.settlementId).isNotNull
+    }
+
+    @ParameterizedTest
+    @AutoSource
+    fun sut_throws_InvalidRequestException_when_id_recipients_of_command_does_not_exists_in_accounts(
+        requesterId: String,
+        price: PriceAmount,
+        recipients: List<Recipient>,
+        unSavedUserId: String
+    ) {
+        //Arrange
+        val publisher = SettlementRequestedEventPublisherSpy()
+        val sut = RequestSettlementCommandExecutor(
+            settlementRepository,
+            publisher,
+            UserGatewayStub(unSavedUserId)
+        )
+
+        val command = RequestSettlementCommand(
+            requesterId = requesterId,
+            price = price,
+            recipients = recipients
+        )
+
+        //Act
+        var actual: InvalidRequestException? = null
+        try {
+            sut.execute(command)
+        } catch (err: InvalidRequestException) {
+            actual = err;
+        }
+
+        // Assert
+        assertThat(actual).isNotNull
+        assertThat(actual!!.errorProperties).isNotEmpty
+        assertThat(actual!!.errorProperties[0].key)
+            .isEqualTo("recipients.userId")
+        assertThat(actual!!.errorProperties[0].errorReason)
+            .isEqualTo(ErrorReason.NotFound)
     }
 }
