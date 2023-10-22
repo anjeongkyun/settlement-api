@@ -8,3 +8,4 @@ include(
     "unit-test"
 )
 include("publisher")
+include("gateway")
