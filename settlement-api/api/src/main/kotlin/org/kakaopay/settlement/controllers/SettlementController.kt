@@ -1,6 +1,8 @@
 package org.kakaopay.settlement.controllers
 
+import org.kakaopay.settlement.commands.RequestSettlementApiCommand
 import org.kakaopay.settlement.commands.RequestSettlementCommand
+import org.kakaopay.settlement.commands.TransferRequestedSettlementApiCommand
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
 import org.kakaopay.settlement.events.PublishUnSettledUserEvent
 import org.kakaopay.settlement.exceptions.InvalidRequestException
@@ -28,29 +30,37 @@ class SettlementController(
 
     @PostMapping("/settlements/commands/request-settlement")
     fun requestSettlement(
-        @RequestBody command: RequestSettlementCommand,
+        @RequestBody command: RequestSettlementApiCommand,
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
     ) {
         try {
             requestedSettlementCommandExecutor.execute(
-                command.copy(requesterId = userId)
+                RequestSettlementCommand(
+                    requesterId = userId,
+                    price = command.price,
+                    recipientIds = command.recipientIds
+                )
             )
         } catch (err: InvalidRequestException) {
-            err.toHttpException(HttpStatus.BAD_REQUEST)
+            throw err.toHttpException(HttpStatus.BAD_REQUEST)
         }
     }
 
     @PostMapping("/settlements/commands/transfer-requested-settlement")
     fun transferRequestedSettlement(
-        @RequestBody command: TransferRequestedSettlementCommand,
+        @RequestBody command: TransferRequestedSettlementApiCommand,
         @RequestHeader(value = "X-USER-ID", required = true) userId: String,
     ) {
         try {
             transferRequestedSettlementCommandExecutor.execute(
-                command.copy(userId = userId)
+                TransferRequestedSettlementCommand(
+                    settlementId = command.settlementId,
+                    price = command.price,
+                    userId = userId
+                )
             )
         } catch (err: InvalidRequestException) {
-            err.toHttpException(HttpStatus.BAD_REQUEST)
+            throw err.toHttpException(HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -83,7 +93,7 @@ class SettlementController(
         try {
             publishUnSettledUserEventHandler.handle(event = event)
         } catch (err: InvalidRequestException) {
-            err.toHttpException(HttpStatus.BAD_REQUEST)
+            throw err.toHttpException(HttpStatus.BAD_REQUEST)
         }
     }
 }
