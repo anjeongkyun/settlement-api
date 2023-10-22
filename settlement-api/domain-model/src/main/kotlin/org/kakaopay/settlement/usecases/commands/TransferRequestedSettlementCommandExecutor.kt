@@ -4,6 +4,9 @@ import org.kakaopay.settlement.SettlementStatus
 import org.kakaopay.settlement.TransactionType
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
 import org.kakaopay.settlement.entities.Transaction
+import org.kakaopay.settlement.exceptions.ErrorProperties
+import org.kakaopay.settlement.exceptions.ErrorReason
+import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.repositories.SettlementRepository
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -14,6 +17,18 @@ class TransferRequestedSettlementCommandExecutor(
     private val settlementRepository: SettlementRepository,
 ) {
     fun execute(command: TransferRequestedSettlementCommand) {
+        if (!settlementRepository.exists(settlementId = command.settlementId)) {
+            throw InvalidRequestException(
+                errorProperties = listOf(
+                    ErrorProperties(
+                        "settlementId",
+                        ErrorReason.NotFound
+                    ),
+                ),
+                message = ""
+            )
+        }
+
         settlementRepository.update(
             command.settlementId
         ) { settlement ->
