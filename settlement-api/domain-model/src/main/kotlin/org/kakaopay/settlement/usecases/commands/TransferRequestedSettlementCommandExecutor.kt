@@ -37,7 +37,7 @@ class TransferRequestedSettlementCommandExecutor(
                 settlement
             } else {
                 settlement.copy(
-                    status = getStatus(settlement, command),
+                    status = decideStatus(settlement, command),
                     recipients = settlement.recipients.map {
                         if (it.userId == command.userId) {
                             it.copy(isSettled = true)
@@ -48,6 +48,7 @@ class TransferRequestedSettlementCommandExecutor(
                     transactions = settlement.transactions + listOf(
                         Transaction(
                             id = UUID.randomUUID().toString(),
+                            userId = command.userId,
                             price = command.price,
                             createdDateTimeUtc = OffsetDateTime.now(ZoneOffset.UTC),
                             type = TransactionType.SETTLEMENT
@@ -58,16 +59,13 @@ class TransferRequestedSettlementCommandExecutor(
         }
     }
 
-    private fun getStatus(
+    private fun decideStatus(
         settlement: Settlement,
         command: TransferRequestedSettlementCommand
-    ): SettlementStatus {
-        val hasSingleUnsettledRecipient = settlement.recipients.count { !it.isSettled } == 1
-        val isCurrentUserUnsettled = settlement.recipients.any { it.userId == command.userId && !it.isSettled }
-        return when {
-            settlement.recipients.all { it.isSettled } -> SettlementStatus.SETTLED
-            hasSingleUnsettledRecipient && isCurrentUserUnsettled -> SettlementStatus.SETTLED
-            else -> SettlementStatus.PENDING
-        }
+    ) = when (settlement.price.value) {
+        settlement.transactions.sumOf { it.price.value } + command.price.value
+        -> SettlementStatus.SETTLED
+
+        else -> SettlementStatus.PENDING
     }
 }

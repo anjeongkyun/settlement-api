@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.kakaopay.settlement.*
 import org.kakaopay.settlement.commands.TransferRequestedSettlementCommand
 import org.kakaopay.settlement.entities.Settlement
+import org.kakaopay.settlement.entities.Transaction
 import org.kakaopay.settlement.exceptions.ErrorReason
 import org.kakaopay.settlement.exceptions.InvalidRequestException
 import org.kakaopay.settlement.repositories.SettlementRepository
@@ -72,12 +73,15 @@ class SpecsForTransferRequestedSettlementCommandExecutor(
 
     @ParameterizedTest
     @AutoSource
-    fun sut_updates_status_of_settlement_to_SETTLED_when_is_transferred(
+    fun sut_updates_status_of_settlement_to_SETTLED_if_sum_of_prices_of_stored_transactions_and_transferred_price_is_equal_price_of_settlement(
         price: PriceAmount,
         settlement: Settlement,
         settledRecipient1: Recipient,
         settledRecipient2: Recipient,
-        notSettledRecipient: Recipient
+        notSettledRecipient: Recipient,
+        transaction1: Transaction,
+        transaction2: Transaction,
+        transaction3: Transaction
     ) {
         //Arrange
         val sut = TransferRequestedSettlementCommandExecutor(
@@ -86,10 +90,20 @@ class SpecsForTransferRequestedSettlementCommandExecutor(
         val arrangeSettlement = settlement.copy(
             id = ObjectId.get().toHexString(),
             status = SettlementStatus.PENDING,
+            price = PriceAmount(
+                value = transaction1.price.value
+                        + transaction2.price.value
+                        + transaction3.price.value,
+                currency = Currency.KRW
+            ),
             recipients = listOf(
                 settledRecipient1.copy(isSettled = true),
                 settledRecipient2.copy(isSettled = true),
                 notSettledRecipient.copy(isSettled = false)
+            ),
+            transactions = listOf(
+                transaction1,
+                transaction2
             )
         )
         val createdSettlement = settlementRepository.create(
@@ -98,7 +112,7 @@ class SpecsForTransferRequestedSettlementCommandExecutor(
         val command = TransferRequestedSettlementCommand(
             settlementId = createdSettlement.id!!,
             userId = notSettledRecipient.userId,
-            price = price
+            price = transaction3.price
         )
 
         //Act
