@@ -31,6 +31,7 @@ class SpecsForRequestSettlementCommandExecutor(
         recipientIds: List<String>
     ) {
         //Arrange
+        val expectedRecipientIds = listOf(requesterId) + recipientIds
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             SettlementRequestedEventPublisherSpy(),
@@ -54,8 +55,9 @@ class SpecsForRequestSettlementCommandExecutor(
         assertThat(actual).isNotNull
         assertThat(actual!!.requesterId).isEqualTo(requesterId)
         assertThat(actual!!.price).isEqualTo(price)
-        assertThat(actual!!.recipients.map { it.userId }).isEqualTo(recipientIds)
-        assertThat(actual!!.recipients.all { it.isSettled == false }).isTrue
+        assertThat(actual!!.recipients.map { it.userId }).isEqualTo(expectedRecipientIds)
+        assertThat(actual!!.recipients.filter { it.userId == requesterId }.first().isSettled).isTrue
+        assertThat(actual!!.recipients.filter { it.userId != requesterId }.all { it.isSettled }).isFalse
     }
 
     @ParameterizedTest
@@ -90,12 +92,14 @@ class SpecsForRequestSettlementCommandExecutor(
 
     @ParameterizedTest
     @AutoSource
-    fun sut_creates_transactions_as_empty_list(
+    fun sut_creates_only_one_transactions_for_the_requester(
         requesterId: String,
         price: PriceAmount,
         recipientIds: List<String>
     ) {
         //Arrange
+        val expectedTransactionPriceValue = price.value / (recipientIds + listOf(requesterId)).count()
+        val expectedTransactionPriceCurrency = price.currency
         val sut = RequestSettlementCommandExecutor(
             settlementRepository,
             SettlementRequestedEventPublisherSpy(),
@@ -115,7 +119,12 @@ class SpecsForRequestSettlementCommandExecutor(
         val actual = settlementRepository.getList(
             requesterId = requesterId
         ).first()
-        assertThat(actual.transactions).isEmpty()
+        assertThat(actual!!.transactions).hasSize(1)
+        assertThat(actual!!.transactions[0].id).isNotNull
+        assertThat(actual!!.transactions[0].price.value)
+            .isEqualTo(expectedTransactionPriceValue)
+        assertThat(actual!!.transactions[0].price.currency)
+            .isEqualTo(expectedTransactionPriceCurrency)
     }
 
     @ParameterizedTest
