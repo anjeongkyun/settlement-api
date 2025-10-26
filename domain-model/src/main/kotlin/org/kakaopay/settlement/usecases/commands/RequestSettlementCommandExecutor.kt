@@ -28,7 +28,7 @@ class RequestSettlementCommandExecutor(
             throw InvalidRequestException(
                 errorProperties = listOf(
                     ErrorProperties(
-                        "recipients.userId",
+                        "userId",
                         ErrorReason.NotFound
                     ),
                 ),
