@@ -21,8 +21,8 @@ class TransferRequestedSettlementCommandExecutor(
             throw InvalidRequestException(
                 errorProperties = listOf(
                     ErrorProperties(
-                        "settlementId22",
-                        ErrorReason.NotFound
+                        "id",
+                        ErrorReason.NotAvailable
                     ),
                 ),
                 message = ""
