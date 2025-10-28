@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/3.1.1/aa13cb8ae0314bb67f9c75e66042a7001b5e406c/spring-boot-configuration-processor-3.1.1.jar" />
+        </processorPath>
+        <module name="settlement-api.unit-test.main" />
+        <module name="settlement-api.data-access.main" />
+        <module name="settlement-api.domain-model.main" />
+        <module name="settlement-api.api.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/3.1.1/aa13cb8ae0314bb67f9c75e66042a7001b5e406c/spring-boot-configuration-processor-3.1.1.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.26/8f8cf0372abf564913e9796623aac4c8ea44025a/lombok-1.18.26.jar" />
+        </processorPath>
+        <module name="settlement-api.contracts.main" />
+        <module name="settlement-api.gateway.main" />
+        <module name="settlement-api.publisher.main" />
+      </profile>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.26/8f8cf0372abf564913e9796623aac4c8ea44025a/lombok-1.18.26.jar" />
+        </processorPath>
+        <module name="settlement-api.publisher.test" />
+        <module name="settlement-api.contracts.test" />
+        <module name="settlement-api.gateway.test" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="17" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_STRING" value="-parameters" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="settlement-api.contracts" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.contracts.main" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.contracts.test" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.gateway" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.gateway.main" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.gateway.test" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.publisher" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.publisher.main" options="-parameters -Xlint:-processing" />
+      <module name="settlement-api.publisher.test" options="-parameters -Xlint:-processing" />
+    </option>
+  </component>
+</project>
